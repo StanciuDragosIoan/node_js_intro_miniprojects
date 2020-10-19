@@ -1,0 +1,198 @@
+/* make text non-selectable */
+* {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                          supported by Chrome and Opera */
+}
+
+body {
+  background: rgb(108, 140, 226);
+}
+
+/* navigation */
+.nav {
+  display: block;
+  margin: auto;
+  width: 40vw;
+}
+
+/* navigation item */
+.nav > .navItem {
+  background: rgb(38, 0, 255);
+  display: inline-block;
+  color: #fff;
+  border: 2px solid #ccc;
+  width: 32%;
+  height: 3rem;
+  text-align: center;
+  padding-top: 10px;
+  border-radius: 15px;
+  font-size: 1.8rem;
+}
+
+.nav > .navItem:hover {
+  cursor: pointer;
+  transition: 1s;
+}
+
+.nav > .navItem:focus {
+  outline: none;
+}
+
+/* colors */
+.colors {
+  background: #fff;
+  width: 10rem;
+  height: 5rem;
+  display: block;
+  margin: auto;
+  margin-top: 2rem;
+  border-radius: 30px;
+}
+
+.color:hover {
+  cursor: pointer;
+}
+
+.color:first-child {
+  background: blue;
+  width: 2rem;
+  height: 2rem;
+  display: inline-block;
+  margin-top: 15%;
+  margin-left: 8%;
+  border-radius: 50%;
+}
+
+.color:nth-child(2) {
+  background: rgb(255, 239, 19);
+  width: 2rem;
+  height: 2rem;
+  display: inline-block;
+  margin-top: 15%;
+  margin-left: 8%;
+  border-radius: 50%;
+}
+
+.color:nth-child(3) {
+  background: pink;
+  width: 2rem;
+  height: 2rem;
+  display: inline-block;
+  margin-top: 15%;
+  margin-left: 8%;
+  border-radius: 50%;
+}
+
+/*hide paper initially*/
+#input {
+  display: none;
+}
+
+/* paper styles for the input form */
+.paper {
+  background: #fff;
+  padding: 60px;
+  position: relative;
+  width: 80vw;
+  display: block;
+  margin: auto;
+  margin-top: 3rem;
+  height: 20rem;
+}
+
+.paper,
+.paper::before,
+.paper::after {
+  /* Styles to distinguish sheets from one another */
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
+  border: 1px solid #bbb;
+}
+
+.paper::before,
+.paper::after {
+  content: "";
+  position: absolute;
+  height: 95%;
+  width: 99%;
+  background-color: #eee;
+}
+
+.paper::before {
+  right: 15px;
+  top: 0;
+  transform: rotate(-1deg);
+  z-index: -1;
+}
+
+.paper::after {
+  top: 5px;
+  right: -5px;
+  transform: rotate(1deg);
+  z-index: -2;
+}
+
+.paper > textarea {
+  border: none;
+  overflow: auto;
+  outline: none;
+
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  /*remove the resize handle on the bottom right*/
+  resize: none;
+
+  font-size: 2rem;
+  width: 100%;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.add-note {
+  background: rgb(156, 154, 154);
+  color: #fff;
+  outline: none;
+  border: 2px solid #eee;
+  font-size: 2rem;
+  border-radius: 15px;
+}
+
+.add-note:hover {
+  cursor: pointer;
+  background: rgb(39, 37, 37);
+  transition: 1s;
+}
+
+/* media queries for responsiveness */
+@media (max-width: 1500px) {
+  .nav {
+    width: 60vw;
+  }
+}
+
+@media (max-width: 1000px) {
+  .nav {
+    width: 80vw;
+  }
+}
+
+@media (max-width: 750px) {
+  .nav {
+    width: 70vw;
+  }
+  .nav > .navItem {
+    display: block;
+    margin: auto;
+    margin-bottom: 1rem;
+    width: 100%;
+  }
+
+  .add-note {
+    font-size: 1.5rem;
+  }
+}

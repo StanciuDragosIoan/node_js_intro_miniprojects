@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Domine:wght@400;700&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/css/main.css" type="text/css" />
+    <title>NodeJS Introduction</title>
+  </head>
+  <body>
+    <h1 class="header">NodeJS Introduction</h1>
+
+    <p class="text">
+      As the title suggests, this article is an introduction to the
+      <span class="snippet">NodeJS</span> runtime. In it, we will look at some
+      basic concepts regarding the runtime, such as:
+      <span class="snippet">JavaScript callbacks</span>,
+      <span class="snippet">asynchronous programming</span>,
+      <span class="snippet">JavaScript Modules</span> and some others, and we
+      will also build some mini projects, very primitive, but useful for the
+      next projects we will be building. These things should teach you how to do
+      basic back-end stuff such as processing submit data from a form, writing
+      to and reading from files, handling a basic node server, etc..
+    </p>
+    <p class="text">
+      Before starting to look at the NodeJS runtime, we need to clarify two
+      concepts first, namely <span class="snippet">callbacks</span> and
+      <span class="snippet">asynchronous programming</span> using JavaScript.
+    </p>
+    <p class="text center bold">Callback functions</p>
+    <p class="text">
+      Callbacks or callback functions are as their name implies, functions that
+      execute after some other code (they are 'called back'). To be more
+      precise, a callback function is passed as an argument to another function
+      which calls it at a given time. They are also called 'call after'
+      functions (because they usually run after some other function executed and
+      'calls them back').
+    </p>
+    <p class="text">Let's see a little example of a callback function:</p>
+    <pre class="code">
+      //define callback
+      const callBack = () => {
+        console.log("callback called...");
+      };
+
+      //define main function
+      const const mainFunction = (callBack) => {
+        console.log("main function called...");
+        //calling callback
+        callBack();
+      }
+
+
+  //call main function which in turn calls the callback
+      mainFunction(callBack);
+    </pre>
+    <p class="text">
+      This is basically how everything works, but it gets even better, some
+      JavaScript methods even take callback functions as default parameters,
+      such functions include higher order functions like
+      <span class="snippet">map</span>, <span class="snippet">sort</span>,
+      <span class="snippet">filter</span>. Paste the below in your browser
+      console (open with f12 on chrome) and hit enter:
+    </p>
+    <pre class="code">
+  const arr = [1,2,3];
+  const doubles = arr.map( (item) => item += item);
+  console.log(doubles); // [2, 4, 6];
+    </pre>
+    <p class="text center bold">Asynchronous programming</p>
+    <p class="text">
+      Before we talk about asynchronous programming, we should clarify what
+      synchronous is. Synchronous blocks of code have to wait for eachother to
+      finish before the next block of code can run. A very basic example of that
+      is the following code:
+    </p>
+    <pre class="code">
+      const job = "Awesome Programmer";
+      prompt("are you a programmer? ");
+      console.log(job);
+    </pre>
+    <p class="text">
+      Note how the <span class="snippet">console.log()</span> call did not
+      execute until you confirmed the prompt. The same happens if you use the
+      <span class="snippet">alert() method</span> because the
+      <span class="snippet">prompt()</span> method and the two are synchronous
+      operations (blocking code which 'blocks' the 'call-stack' that's the order
+      in which functions are executed inside our script). So until we confirm
+      the prompt, nothing happens.
+    </p>
+    <p class="text">
+      Let's now see an example in which asynchronous code is executed and the
+      call stack is not blocked in the mean-time. Paste the below code in your
+      browser console and hit enter:
+    </p>
+    <pre class="code">
+      console.log("first operation is done");
+
+      setTimeout(() => 
+        { console.log("async operation has finished") }
+          , 1000);
+
+      console.log("third operation is called"); 
+      
+    </pre>
+    <p class="text">The output of that will be:</p>
+    <pre class="code">
+      first operation is done
+      third operation is called
+      undefined
+      async operation has finished
+    </pre>
+    <p class="text">
+      The reason for that is that, the
+      <span class="snippet">call-stack</span> saw the first operation's log and
+      printed it, then it saw the <span class="snippet">setTimeout()</span> call
+      and it handled it to the browser API (there are more of these, they can do
+      awesome things and you will learn how to use them in time) to be processed
+      asynchronously in the background (this lasts 1 second). Next it saw the
+      last log for the 'third operation' and it printed it. Next the new kid in
+      town pops up (that's the JavaScript Engine's
+      <span class="snippet">Event Loop</span> -for now just read about it if you
+      are curious ) and checks if there's any work for it to do. Since there is
+      nothing (because the 1 second needed for
+      <span class="snippet">setTimeout()</span> is not over yet)
+      <span class="snippet">setTimeout()</span>
+      returns undefined. Finally the one second is over and the 'async operation
+      has finished'. This is how asynchronous programming works. In a
+      synchronous setup, the 'third operation' log would have had to wait for 1
+      second before being executed.
+    </p>
+    <p class="text center bold">How are callbacks used in nodeJS</p>
+    <p class="text">
+      NodeJS uses callbacks heavily in order to allow us to execute operations
+      asynchronously, without blocking the execution thread. Instead of doing
+      something like:
+    </p>
+    <pre class="code">
+      const processFileData = () => {
+        let fileData = getFileData();
+        return data;
+      }
+
+    </pre>
+    <p class="text">In node we would have something like:</p>
+    <pre class="code">
+      function processFileData (nextFuncToCall) {
+        fetchData(function (err, fileData) {
+          if (err) {
+            console.log("Error, something went booBoo X__x");
+            return nextFuncToCall(err);
+          }
+          fileData += 5;
+          return nextFuncToCall(fileData);
+        });
+      }
+    </pre>
+    <p class="text">
+      In this way the code execution does not have to pause for certain
+      operations that take longer, such as network requests or reading data from
+      a file (especailly if the file is very big). The code keeps executing and
+      once it's done with the longer operation it calls back a 'callback
+      function' without interrupting the execution of our program.
+    </p>
+    <p class="text center bold">JavaScript modules</p>
+    <p class="text">
+      The last element we need to discuss before diving into actual
+      <span class="snippet">nodeJS</span> code and building some mini-projects
+      which will get you familiar with the runtime, are JavaScript modules.
+    </p>
+    <p class="text">
+      If you come from a different language such as
+      <span class="snippet">PHP</span> or <span class="snippet">Java</span>, you
+      are familiar with scripts which are 'imported' inside our application
+      through a syntax such as:
+    </p>
+    <pre class="code">
+      require_once("my awesome module");//PHP import
+      import java.util.ArrayList; //Java import
+    </pre>
+    <p class="text">
+      This is very handy as we can have whole bunch of functionalities grouped
+      under separate files (or modules), which we can use throughout our
+      applications.
+    </p>
+    <p class="text">
+      JavaScript provides this mechanism as well. It did not use to have it, but
+      modules got introduced to the language starting 2009 with the emergence of
+      runtime environments such as
+      <span class="snippet">nodeJS</span>.
+    </p>
+    <p class="text">
+      We will discuss ES Modules (Ecma Script Modules) and common nodeJS
+      modules.
+    </p>
+    <p class="text center bold">ES Modules</p>
+    <p class="text">
+      If we want to re-use a certain bit of JS code in different places
+      throughout our app, we would do something like this:
+    </p>
+    <pre class="code">
+      const myAwesomeLogger = () => 
+        { console.log("Logged something awesome
+      here.."); }
+
+      export { myAwesomeLogger }
+    </pre>
+    <p class="text">
+      Let's create a little project now and have fun with some
+      <span class="snippet">JS</span> modules and some
+      <span class="snippet">nodeJS</span> scripts.
+    </p>
+    <p class="text">
+      Create a directory (I named mine 'mini-projects'),
+      <span class="snippet">cd</span> into it and run the below command:
+    </p>
+    <pre class="code">
+      npm init -y
+    </pre>
+    <p class="text">
+      This script generates you a <span class="snippet">package.json</span> file
+      and configures a basic node project. The
+      <span class="snippet">-y</span> flag just puts default values for keys
+      such as: name, version, etc... If you ommit it, it will ask you for the
+      values and I did not want you to waste time with this now. In a future
+      project we will configure an <span class="snippet">npm</span> project more
+      in depth.
+    </p>
+    <p class="text">
+      Let's add a "start" script in the
+      <span class="snippet">package.json</span> file. You can replace the test
+      script with it, inside the 'scripts' object. Now your
+      <span class="snippet">package.json</span> file looks like this:
+    </p>
+    <pre class="code">
+      {
+        "name": "mini-projects",
+        "version": "1.0.0",
+        "description": "",
+        "main": "server.js",
+        "scripts": {
+          "start": "node server"
+        },
+        "keywords": [],
+        "author": "",
+        "license": "ISC"
+      }      
+    </pre>
+    <p class="text">
+      Next create a <span class="snippet">server.js</span> file (note that it is
+      the one file that you just told the
+      <span class="snippet">npm</span> script to execute when you run
+      <span class="snippet">npm start</span>. Test that the file is executed by
+      pasting a
+      <span class="snippet"
+        >console.log("Welcome to my first node script ^___^");</span
+      >
+      in it and runnning:
+    </p>
+    <pre class="code">
+      npm start
+    </pre>
+    <p class="text">
+      Now that your server runs, let's play a bit with
+      <span class="snippet">JavaScript</span> modules.
+    </p>
+    <p class="text">
+      Create a <span class="snippet">sampleJsModule.js</span> file and paste the
+      below code in it:
+    </p>
+    <pre class="code">
+      const sampleJsModule = () => {
+        console.log("Module 1 here..");
+      };
+      
+      export { sampleJsModule };      
+    </pre>
+    <p class="text">
+      Next in the <span class="snippet">server.js</span> import the sample
+      module:
+    </p>
+    <pre class="code">
+console.log("Welcome to my first node script ٩(^ᴗ^)۶ !");
+
+import { sampleJsModule } from "./sampleJsModule";
+
+sampleJsModule();
+
+    </pre>
+    <p class="text">
+      Next run <span class="snippet">npm start</span> and you will get a long
+      error and if you scroll atop of it you will see:
+    </p>
+    <div class="devPic">
+      <img src="./img/modules_error.png" alt="" />
+    </div>
+    <p class="text">
+      We need to set the <span class="snippet">type</span> module in the
+      <span class="snippet">package.json</span> file. Add it just as per below:
+    </p>
+    <pre class="code">
+      {
+        "name": "mini-projects",
+        "version": "1.0.0",
+        "description": "",
+        "main": "server.js",
+        "type": "module",
+        "scripts": {
+          "start": "node server"
+        },
+        "keywords": [],
+        "author": "",
+        "license": "ISC"
+      }
+    </pre>
+    <p class="text">
+      Next run <span class="snippet">npm start</span> again and the module will
+      work. Congratz! You have just created, imported and used your first
+      <span class="snippet">EcmaScript Module</span> !
+    </p>
+    <p class="text center bold">Node modules</p>
+    <p class="text">
+      Let's create another module this time let's call it
+      <span class="snippet">NodeJSModule.js</span> and add the below code to it:
+    </p>
+    <pre class="code">
+      const nodeModule = {
+        callModule: () => {
+          console.log("Module from node 
+          'module' called =) !");
+        },
+      };
+      
+      export default nodeModule;
+    </pre>
+    <p class="text">
+      Next import it in <span class="snippet">server.js</span>:
+    </p>
+    <pre class="code">
+      console.log("Welcome to my first node script ٩(^ᴗ^)۶ !");
+
+      import { sampleJsModule } from "./sampleJsModule.js";
+
+      const nodeModule = require("./NodeJSModule");
+
+      sampleJsModule();
+
+      nodeModule.call();
+
+    </pre>
+    <p class="text">
+      Next comment out the import for the sample module and the call to its
+      method. Also remove the "module" type from package.json:
+    </p>
+    <pre class="code">
+      {
+        "name": "mini-projects",
+        "version": "1.0.0",
+        "description": "",
+        "main": "server.js",
+        "scripts": {
+          "start": "node server"
+        },
+        "keywords": [],
+        "author": "",
+        "license": "ISC"
+      }      
+    </pre>
+    <p class="text">
+      Now run <span class="snippet">npm start</span> and your node module works
+      by default (you did not have to specify the "module" type anymore).
+    </p>
+    <p class="text center bold">A NodeJS Server</p>
+    <p class="text">
+      Now that you know how asynchronous programming, callbacks and node modules
+      work, you are ready to start creating server-side applications using the
+      <span class="snippet">nodeJS</span> runtime environment.
+    </p>
+  </body>
+</html>
