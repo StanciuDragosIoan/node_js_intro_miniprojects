@@ -20,10 +20,10 @@
       <span class="snippet">JavaScript callbacks</span>,
       <span class="snippet">asynchronous programming</span>,
       <span class="snippet">JavaScript Modules</span> and some others, and we
-      will also build some mini projects, very primitive, but useful for the
-      next projects we will be building. These things should teach you how to do
-      basic back-end stuff such as processing submit data from a form, writing
-      to and reading from files, handling a basic node server, etc..
+      will also build some mini projects, very primitive, but useful for our
+      next projects.. These things should teach you how to do basic back-end
+      stuff such as processing submit data from a form, writing to and reading
+      from files, handling a basic node server, etc..
     </p>
     <p class="text">
       Before starting to look at the NodeJS runtime, we need to clarify two
@@ -86,10 +86,10 @@
       Note how the <span class="snippet">console.log()</span> call did not
       execute until you confirmed the prompt. The same happens if you use the
       <span class="snippet">alert() method</span> because the
-      <span class="snippet">prompt()</span> method and the two are synchronous
-      operations (blocking code which 'blocks' the 'call-stack' that's the order
-      in which functions are executed inside our script). So until we confirm
-      the prompt, nothing happens.
+      <span class="snippet">prompt()</span> method and the other two are
+      synchronous operations (blocking code which 'blocks' the 'call-stack'
+      that's the order in which functions are executed inside our script). So
+      until we confirm the prompt, nothing happens.
     </p>
     <p class="text">
       Let's now see an example in which asynchronous code is executed and the
@@ -206,6 +206,7 @@
         { console.log("Logged something awesome
       here.."); }
 
+      //we will import this in a different file
       export { myAwesomeLogger }
     </pre>
     <p class="text">
@@ -285,7 +286,7 @@
     <pre class="code">
 console.log("Welcome to my first node script ٩(^ᴗ^)۶ !");
 
-import { sampleJsModule } from "./sampleJsModule";
+import { sampleJsModule } from "./sampleJsModule.js";
 
 sampleJsModule();
 
@@ -327,14 +328,13 @@ sampleJsModule();
       <span class="snippet">NodeJSModule.js</span> and add the below code to it:
     </p>
     <pre class="code">
-      const nodeModule = {
-        callModule: () => {
-          console.log("Module from node 
-          'module' called =) !");
-        },
-      };
+const nodeModule = {
+  callModule: () => {
+    console.log("Module from node 'module' called =) !");
+  },
+};
       
-      export default nodeModule;
+      module.exports = nodeModule;
     </pre>
     <p class="text">
       Next import it in <span class="snippet">server.js</span>:
@@ -348,7 +348,7 @@ sampleJsModule();
 
       sampleJsModule();
 
-      nodeModule.call();
+      nodeModule.callModule();
 
     </pre>
     <p class="text">
@@ -378,6 +378,128 @@ sampleJsModule();
       Now that you know how asynchronous programming, callbacks and node modules
       work, you are ready to start creating server-side applications using the
       <span class="snippet">nodeJS</span> runtime environment.
+    </p>
+    <p class="text">
+      Let's use the same <span class="snippet">mini-projects</span> directory
+      and the same NPM script. We will create a server in
+      <span class="snippet">nodeJS</span>. First, move the 2 modules in a
+      <span class="snippet">custom_modules</span> directory and keep them for
+      reference. Next we will create a server. Replace the contents in
+      <span class="snippet">server.js</span> with the below:
+    </p>
+    <pre class="code">
+//import http module for our server
+const http = require("http");
+
+//define port for our server to listen to
+const PORT = process.env.port || 5000;
+
+//define request listener
+const requestListener = (req, res) => {
+  //define url
+  const url = req.url;
+
+  switch (url) {
+    case "/":
+      //write client response
+      res.write(`
+    &lt;h1&gt;Welcome to our nodeJS Server&lt;/h1&gt; 
+    `);
+      //send client response
+      res.end();
+      break;
+  }
+}
+
+
+//create server
+const server = http.createServer(requestListener);
+
+//log some output to see everything's ok
+console.log(`Server is running on port: 
+            ${PORT} so our API is alive =)
+            `);
+
+//start the server
+server.listen(PORT);
+
+    </pre>
+    <p class="text">
+      Run now <span class="snippet">npm start</span> and if you go to
+      <span class="snippet">
+        <a href="http://localhost:5000/" target="_blank"
+          >http://localhost:5000/</a
+        ></span
+      >
+      you can see that the server is running. Also if you check in the console
+      in the terminal prompt you used to start the server, you will see the
+      <span class="snippet">console.log</span> above. In a nutsheell the code
+      above uses a core <span class="snippet">nodeJS module</span> (you know
+      what these are by now) namely the <span class="snippet">http</span> module
+      to create a server. The server is created using the
+      <span class="snippet">createServer()</span> method from the
+      <span class="snippet">http</span> module. The method takes in a
+      <span class="snippet">requestListener</span> method which takes in as
+      parameters the <span class="snippet">request</span> and the
+      <span class="snippet">response</span> objects. These objects help us read
+      the server request and configure the server response. This is how a server
+      works at a very basic level, it receives requests, processes them and
+      returns a response. For instance we are using the request object to read
+      the <span class="snippet">url</span> to which the request is being made
+      (so we can have different routes in our applications, so different urls
+      which to do different things). Once the server is created we log some
+      successful output in the console and start the server with the
+      <span class="snippet">listen()</span> method which takes in a port. The
+      port is defined as
+      <span class="snippet">process.env.port || 5000</span> (note the or ||
+      operator there) so that if we ever deploy our application to a real
+      server, it can also use the default configuration of that server, and if
+      there is no default configuration there, it will use the port 5000.
+    </p>
+    <p class="text">
+      I defined the request listener as a separate function to introduce you to
+      it but most often you will see it defined and passed to the
+      <span class="snippet">createServer()</span> method as an anonymous arrow
+      function like so:
+    </p>
+    <pre class="code">
+//import http module for our server
+const http = require("http");
+
+//define port for our server to listen to
+const PORT = process.env.port || 5000;
+
+//create server
+const server = http.createServer( (req, res) => {
+  //define url
+  const url = req.url;
+
+  switch (url) {
+    case "/":
+      //write client response
+      res.write(`
+    &lt;h1&gt;Welcome to our nodeJS Server&lt;/h1&gt; 
+    `);
+      //send client response
+      res.end();
+      break;
+  }
+});
+
+//log some output to see everything's ok
+console.log(`Server is running on port: 
+            ${PORT} so our API is alive =)
+            `);
+
+//start the server
+server.listen(PORT);
+    </pre>
+    <p class="text">
+      Replace the code in <span class="snippet">server.js</span> with the
+      snippet above, press <span class="snippet">ctrl + c</span> in the command
+      prompt to stop the server and restart it by running
+      <span class="snippet">npm start</span> and you will see that the
+      application works exactly the same.
     </p>
   </body>
 </html>

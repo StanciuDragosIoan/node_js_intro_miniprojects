@@ -1,9 +1,30 @@
-console.log("Welcome to my first node script ٩(^ᴗ^)۶ !");
+//import http module for our server
+const http = require("http");
 
-// import { sampleJsModule } from "./sampleJsModule.js";
+//define port for our server to listen to
+const PORT = process.env.port || 5000;
 
-const nodeModule = require("./NodeJSModule");
+//create server
+const server = http.createServer((req, res) => {
+  //define url
+  const url = req.url;
 
-// sampleJsModule();
+  switch (url) {
+    case "/":
+      //write client response
+      res.write(`
+    <h1>Welcome to our nodeJS Server</h1> 
+    `);
+      //send client response
+      res.end();
+      break;
+  }
+});
 
-nodeModule.callModule();
+//log some output to see everything's ok
+console.log(`Server is running on port: 
+            ${PORT} so our API is alive =)
+            `);
+
+//start the server
+server.listen(PORT);
