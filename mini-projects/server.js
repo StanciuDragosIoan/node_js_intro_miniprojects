@@ -1,5 +1,6 @@
 //import http module for our server
 const http = require("http");
+const contactManager = require("./custom_modules/contactManager");
 const logger = require("./custom_modules/logger");
 
 //define port for our server to listen to
@@ -31,6 +32,10 @@ const server = http.createServer((req, res) => {
       } else if (method === "POST") {
         logger.processForm(req, res);
       }
+      break;
+    case "/contact-manager":
+      contactManager.displayWelcomeScreen(res);
+      res.end();
       break;
     default:
       res.write(`

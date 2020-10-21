@@ -1,0 +1,2 @@
+Logged at: 21-Oct-2020, textLogged: test  
+Logged at: 21-Oct-2020, textLogged: est test  

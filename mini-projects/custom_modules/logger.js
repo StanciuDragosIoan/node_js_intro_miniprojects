@@ -1,5 +1,5 @@
 const fs = require("fs");
-const path = require("path");
+// const path = require("path");
 const logger = {
   renderLoggerForm: (res) => {
     res.write(`
@@ -63,7 +63,31 @@ const logger = {
     });
   },
 
-  logToFile: (res, parsedBody) => {},
+  logToFile: (res, parsedBody) => {
+    //define logs dir
+    const logDirectory = "./logs";
+    //process data to log
+    const dataToLog = parsedBody.split("=")[1].split("+").join(" ");
+    const date = new Date()
+      .toString()
+      .replace(/\S+\s(\S+)\s(\d+)\s(\d+)\s.*/, "$2-$1-$3");
+    //create dir if it does not exist
+    if (!fs.existsSync(logDirectory)) {
+      fs.mkdirSync(logDirectory);
+    }
+    fs.appendFile(
+      "./logs/logs.txt",
+      `Logged at: ${date}, textLogged: ${dataToLog} \n`,
+      function (err) {
+        if (err) throw err;
+      }
+    );
+    //redirect back to homepage
+    res.statusCode = 302; //redirect
+    res.setHeader("Location", "/");
+
+    return res.end();
+  },
 };
 
 module.exports = logger;
