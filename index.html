@@ -499,7 +499,429 @@ server.listen(PORT);
       snippet above, press <span class="snippet">ctrl + c</span> in the command
       prompt to stop the server and restart it by running
       <span class="snippet">npm start</span> and you will see that the
-      application works exactly the same.
+      application works exactly the same. Let's also add a default case in our
+      <span class="snippet">switch</span> so that, if the client (the browser
+      request) hits a random endpoint except the ones we are going to specify,
+      the app returns a 404 page. Replace the
+      <span class="snippet">server.js</span> contents as per below:
     </p>
+    <pre class="code">
+//import http module for our server
+const http = require("http");
+
+//define port for our server to listen to
+const PORT = process.env.port || 5000;
+
+//create server
+const server = http.createServer( (req, res) => {
+  //define url
+  const url = req.url;
+
+  switch (url) {
+    case "/":
+      //write client response
+      res.write(`
+    &lt;h1&gt;Welcome to our nodeJS Server&lt;/h1&gt; 
+    `);
+      //send client response
+      res.end();
+      break;
+    default:
+      res.write(`
+      &lt;h1&gt;404 page not found X_x&lt;/h1&gt;  
+      `);
+      res.end();
+      break;  
+  }
+});
+
+//log some output to see everything's ok
+console.log(`Server is running on port: 
+            ${PORT} so our API is alive =)
+            `);
+
+//start the server
+server.listen(PORT);
+    </pre>
+    <p class="text">Now stop the server again and before restarting it run:</p>
+    <pre class="code">
+      npm i --save -D nodemon
+    </pre>
+    <p class="text">
+      This command installs <span class="snippet">nodemon</span> a dependency
+      that restarts your server upon any change, without you having to stop it
+      and restart it manually anymore.
+    </p>
+    <p class="text">
+      Next modify the <span class="snippet">start</span> script in the scripts
+      object in <span class="snippet">package.json</span> as per below:
+    </p>
+    <pre class="code">
+      {
+        "name": "mini-projects",
+        "version": "1.0.0",
+        "description": "",
+        "main": "server.js",
+        "scripts": {
+          "start": "nodemon server.js"
+        },
+        "keywords": [],
+        "author": "",
+        "license": "ISC",
+        "devDependencies": {
+          "nodemon": "^2.0.6"
+        }
+      }
+    </pre>
+    <p class="text">
+      Now, if you hit the
+      <span class="snippet"
+        ><a href="http://localhost:5000" target="_blank"
+          >http://localhost:5000</a
+        ></span
+      >
+      endpoint you get the view we set initially. As for any other url, for now
+      we will get the 404 page. Test that by trying to go to
+      <span class="snippet"
+        ><a href="http://localhost:5000/test" target="_blank"
+          >http://localhost:5000/test</a
+        ></span
+      >
+    </p>
+    <p class="text center bold">Logger mini project</p>
+    <p class="text">
+      Let's start working on the logger project. This will be a little logger
+      application that will grab some user input and log it to a file in a
+      nicely structured way.
+    </p>
+    <p class="text">
+      Start by adding the endpoint for it in a
+      <span class="snippet">case</span> in our switch statement. Add one for the
+      <span class="snippet">/logger endpoint:</span>
+    </p>
+    <pre class="code">
+//import http module for our server
+const http = require("http");
+
+//define port for our server to listen to
+const PORT = process.env.port || 5000;
+
+//create server
+const server = http.createServer( (req, res) => {
+  //define url
+  const url = req.url;
+
+  switch (url) {
+    case "/":
+      //write client response
+      res.write(`
+    &lt;h1&gt;Welcome to our nodeJS Server&lt;/h1&gt; 
+    `);
+      //send client response
+      res.end();
+      break;
+    case "/logger": 
+    res.write(`
+    &lt;h1&gt;Welcome to our Logger Application&lt;/h1&gt; 
+    `); 
+    res.end();
+    break;
+      break;
+    default:
+      res.write(`
+      &lt;h1&gt;404 page not found X_x&lt;/h1&gt;  
+      `);
+      res.end();
+      break;  
+  }
+});
+
+//log some output to see everything's ok
+console.log(`Server is running on port: 
+            ${PORT} so our API is alive =)
+            `);
+
+//start the server
+server.listen(PORT);
+    </pre>
+    <p class="text">
+      For simplicity's sake we will put all of our logger inside a separate
+      module. Create a <span class="snippet">logger.js</span> file inside the
+      <span class="snippet">custom_modules</span> directory and add the below to
+      it:
+    </p>
+    <pre class="code">
+const logger = {
+  renderLoggerForm: (res) => {
+    res.write(`
+            &lt;form
+                style="${logger.formStyles}"
+                action="/logger"
+                method="POST"
+            &gt;
+                &lt;input 
+                  name="logText"
+                  style="${logger.formField}"
+                  type="text"&gt;
+                &lt;button 
+                  style="${logger.formBtn}"
+                  type="submit"&gt;
+                  Log something
+                &lt;/button&gt;
+            &lt;/form&gt;
+        `);
+  },
+
+  formStyles: `
+        display:block; 
+        margin:auto; 
+        padding:2rem; 
+        font-size:1rem; 
+        background: #ddd; 
+        border: 2px solid #000; 
+        border-radius:5px;
+        max-width:600px;
+    `,
+
+  formBtn: `
+    display:block;
+    margin:auto;
+    width:60%;
+    padding:1rem;
+    font-size:2rem;
+    margin-top:3rem;
+  `,
+
+  formField: `
+    display:block;
+    margin:auto;
+    text-align:center;
+    font-size:2rem;
+  `,
+};
+      
+      module.exports = logger;
+      
+    </pre>
+    <p class="text">
+      Next, import the module up top in the
+      <span class="snippet">server.js</span>:
+    </p>
+    <pre class="code">
+const logger = require("./custom_modules/logger");
+    </pre>
+    <p class="text">
+      Also we can use the logger method now in
+      <span class="snippet">server.js</span>. Just add the call to it in the
+      <span class="snippet">/logger</span> case
+    </p>
+    <pre class="code">
+      case "/logger":
+      res.write(`
+    &lth1&gt;
+      Welcome to our Logger Application
+    &lt;/h1&gt; 
+    `);
+      logger.renderLoggerForm(res);
+      res.end();
+      break;
+    </pre>
+    <p class="text">
+      Now if you go to
+      <span class="snippet"
+        ><a href="http://localhost:5000/logger" target="_blank"
+          >http://localhost:5000/logger</a
+        ></span
+      >
+      you can see our logger's form. Let's next add the logic for processing the
+      data. Note that the form has an
+      <span class="snippet">action</span> attribute and a
+      <span class="snippet">method</span> one. Also, the input field has a
+      <span class="snippet">name</span> attribute. That's what we will use to
+      process the data. First, the <span class="snippet">action</span> says
+      "/logger" so that's the <span class="snippet">route</span> we will hit
+      with our http request. We already have it set up in our
+      <span class="snippet">server.js</span> but we are not checking the request
+      type and no matter what for now we just display the logging form. We need
+      to change that. Modify the <span class="snippet">server.js</span> as per
+      below:
+    </p>
+    <pre class="code">
+//import http module for our server
+const http = require("http");
+const logger = require("./custom_modules/logger");
+
+//define port for our server to listen to
+const PORT = process.env.port || 5000;
+
+//create server
+const server = http.createServer((req, res) => {
+  //define url
+  const url = req.url;
+  //define method
+  const method = req.method;
+  switch (url) {
+    case "/":
+      //write client response
+      res.write(`
+    &lt;h1&gt;Welcome to our nodeJS Server&lt;/h1&gt; 
+    `);
+      //send client response
+      res.end();
+      break;
+    case "/logger":
+      if (method === "GET") {
+        res.write(`
+        &lt;h1  
+        &gt;Welcome to our Logger Application&lt;/h1&gt; 
+        `);
+        logger.renderLoggerForm(res);
+      } else if (method === "POST") {
+        res.write("POST HERE FOR LOGGER! ^__X");
+      }
+
+      res.end();
+      break;
+    default:
+      res.write(`
+      &lt;h1&gt;404 page not found X_x&lt;/h1&gt;  
+      `);
+      res.end();
+      break;
+  }
+});
+
+//log some output to see everything's ok
+console.log(`Server is running on port: 
+            ${PORT} so our API is alive =)
+            `);
+
+//start the server
+server.listen(PORT);
+
+    </pre>
+    <p class="text">
+      Now, if we hit the <span class="snippet">/logger</span> endpoint with a
+      <span class="snippet">GET</span> request, we get the form displayed, but
+      if we submit the form, we get the "POST.." print. Let's just replace that
+      with the form processing logic. Replace the
+      <span class="snippet">res.write("POST HERE FOR LOGGER! ^__X");</span>
+      with: <span class="snippet"> logger.processForm(req, res);</span>
+    </p>
+    <p class="text">
+      Next, add the <span class="snippet">processForm()</span> method inside the
+      <span class="snippet">logger.js</span>:
+    </p>
+    <pre class="code">
+      const logger = {
+        renderLoggerForm: (res) => {
+          res.write(`
+                  &lt;form
+                      style="${logger.formStyles}"
+                      action="/logger"
+                      method="POST"
+                  &gt;
+                      &lt;input 
+                        name="logText"
+                        style="${logger.formField}"
+                        type="text"&gt;
+                      &lt;button 
+                        style="${logger.formBtn}"
+                        type="submit"&gt;
+                        Log something
+                      &lt;/button&gt;
+                  &lt;/form>
+              `);
+        },
+      
+        formStyles: `
+              display:block; 
+              margin:auto; 
+              padding:2rem; 
+              font-size:1rem; 
+              background: #ddd; 
+              border: 2px solid #000; 
+              border-radius:5px;
+              max-width:600px;
+          `,
+      
+        formBtn: `
+          display:block;
+          margin:auto;
+          width:60%;
+          padding:1rem;
+          font-size:2rem;
+          margin-top:3rem;
+        `,
+      
+        formField: `
+          display:block;
+          margin:auto;
+          text-align:center;
+          font-size:2rem;
+        `,
+
+        processForm: (req, res) => {
+          const body = [];
+          //on data to start reading data
+          req.on("data", (chunk) => { 
+            body.push(chunk);
+          });
+
+          //on end to finish reading stream
+          req.on("end", () => {
+            const parsedBody = Buffer.concat(body).toString();
+            console.log(`parsedBody here: ${parsedBody}`);
+      
+            res.write("POST HERE");
+            res.end();
+          });
+        },
+      };
+            
+      module.exports = logger;   
+    </pre>
+    <p class="text">
+      Note how we are using 2 events inside the
+      <span class="snippet">processForm()</span> method. The submit data comes
+      actually as a stream that we are reading inside of our application. We are
+      reading it in 'chunks'. The event for that is the
+      <span class="snippet">on("data", ()=> {})</span> event which takes in a
+      callback function as you can see. Inside of that callback we push the
+      chunks onto the 'body' array. Finally after all the data has been sent and
+      all the chunks 'pushed' onto the array, we use the
+      <span class="snippet">on("end", ()=> {})</span> event with another
+      callback. Inside of it we use the built-in Buffer object to concatenate
+      the chunks and parse them as string. The result of that we are logging it.
+      Try submitting the form and you will see logged the value of your submit.
+      So our data has now hit the server. Let's make the
+      <span class="snippet">processForm()</span> call another method (we'll call
+      it <span class="snippet">logToFile()</span> ) this time. Add the below
+      line at the end of the <span class="snippet">processForm()</span> method
+      and delete the <span class="snippet">res.write("POST HERE")</span> and the
+      <span class="snippet">res.end()</span> calls:
+    </p>
+    <pre class="code">
+      logger.logToFile(res, parsedBody);
+    </pre>
+    <p class="text">
+      Let's now complete the <span class="snippet">logger.js</span> file with
+      our last method. We will use the <span class="snippet">fs</span> module
+      for that. <span class="snippet">fs</span> stands for file system and it is
+      a module that allows us to read from and write to files. Replace the code
+      in <span class="snippet">logger.js</span> as per below:
+    </p>
+    <p class="text center bold">
+      CRUD - contacts list- mini project (to define scope and all)
+    </p>
+
+    <p class="text center bold">
+      Image uploader & gallery project (to define scope and all)
+    </p>
+    <p class="text center bold">
+      Quick Login system (could be a plugin which we can add to any basic
+      application- to define scope and all)
+    </p>
+    <p class="text center bold">Email sender (to define scope and all)</p>
   </body>
 </html>

@@ -1,5 +1,6 @@
 //import http module for our server
 const http = require("http");
+const logger = require("./custom_modules/logger");
 
 //define port for our server to listen to
 const PORT = process.env.port || 5000;
@@ -8,7 +9,8 @@ const PORT = process.env.port || 5000;
 const server = http.createServer((req, res) => {
   //define url
   const url = req.url;
-
+  //define method
+  const method = req.method;
   switch (url) {
     case "/":
       //write client response
@@ -16,6 +18,24 @@ const server = http.createServer((req, res) => {
     <h1>Welcome to our nodeJS Server</h1> 
     `);
       //send client response
+      res.end();
+      break;
+    case "/logger":
+      if (method === "GET") {
+        res.write(`
+        <h1  
+        >Welcome to our Logger Application</h1> 
+        `);
+        logger.renderLoggerForm(res);
+        res.end();
+      } else if (method === "POST") {
+        logger.processForm(req, res);
+      }
+      break;
+    default:
+      res.write(`
+      <h1>404 page not found X_x</h1>  
+      `);
       res.end();
       break;
   }
