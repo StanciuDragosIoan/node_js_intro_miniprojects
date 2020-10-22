@@ -35,7 +35,13 @@ const server = http.createServer((req, res) => {
       break;
     case "/contact-manager":
       contactManager.displayWelcomeScreen(res);
-      res.end();
+      contactManager.displayAddContact(res);
+      contactManager.displayContacts(res);
+      break;
+    case "/contact-manager/add":
+      if (method === "POST") {
+        contactManager.addContact(req, res);
+      }
       break;
     default:
       res.write(`

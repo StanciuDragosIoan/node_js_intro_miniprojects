@@ -24,6 +24,7 @@ const logger = {
   formStyles: `
         display:block; 
         margin:auto; 
+        margin-top:1rem;
         padding:2rem; 
         font-size:1rem; 
         background: #ddd; 
@@ -36,7 +37,7 @@ const logger = {
     display:block;
     margin:auto;
     width:60%;
-    padding:1rem;
+    padding:0.5rem;
     font-size:2rem;
     margin-top:3rem;
   `,
@@ -46,6 +47,7 @@ const logger = {
     margin:auto;
     text-align:center;
     font-size:2rem;
+    margin-top:1rem;
   `,
 
   processForm: (req, res) => {

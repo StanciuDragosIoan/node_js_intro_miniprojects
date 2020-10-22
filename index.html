@@ -675,6 +675,7 @@ const logger = {
   formStyles: `
         display:block; 
         margin:auto; 
+        margin-top:1rem;
         padding:2rem; 
         font-size:1rem; 
         background: #ddd; 
@@ -687,7 +688,7 @@ const logger = {
     display:block;
     margin:auto;
     width:60%;
-    padding:1rem;
+    padding:0.5rem;
     font-size:2rem;
     margin-top:3rem;
   `,
@@ -695,6 +696,7 @@ const logger = {
   formField: `
     display:block;
     margin:auto;
+    margin-top:1rem;
     text-align:center;
     font-size:2rem;
   `,
@@ -837,6 +839,7 @@ server.listen(PORT);
         formStyles: `
               display:block; 
               margin:auto; 
+              margin-top:1rem;
               padding:2rem; 
               font-size:1rem; 
               background: #ddd; 
@@ -849,7 +852,7 @@ server.listen(PORT);
           display:block;
           margin:auto;
           width:60%;
-          padding:1rem;
+          padding:0.5rem;
           font-size:2rem;
           margin-top:3rem;
         `,
@@ -857,6 +860,7 @@ server.listen(PORT);
         formField: `
           display:block;
           margin:auto;
+          margin-top:1rem;
           text-align:center;
           font-size:2rem;
         `,
@@ -870,9 +874,7 @@ server.listen(PORT);
 
           //on end to finish reading stream
           req.on("end", () => {
-            const parsedBody = Buffer.concat(body).toString();
-            console.log(`parsedBody here: ${parsedBody}`);
-      
+            const parsedBody = Buffer.concat(body).toString(); 
             res.write("POST HERE");
             res.end();
           });
@@ -938,6 +940,7 @@ const logger = {
   formStyles: `
         display:block; 
         margin:auto; 
+        margin-top:1rem;
         padding:2rem; 
         font-size:1rem; 
         background: #ddd; 
@@ -950,7 +953,7 @@ const logger = {
     display:block;
     margin:auto;
     width:60%;
-    padding:1rem;
+    padding:0.5rem;
     font-size:2rem;
     margin-top:3rem;
   `,
@@ -958,6 +961,7 @@ const logger = {
   formField: `
     display:block;
     margin:auto;
+    margin-top:1rem;
     text-align:center;
     font-size:2rem;
   `,
@@ -971,8 +975,7 @@ const logger = {
 
     //on end to finish reading stream
     req.on("end", () => {
-      const parsedBody = Buffer.concat(body).toString();
-      console.log(`parsedBody here: ${parsedBody}`);
+      const parsedBody = Buffer.concat(body).toString(); 
       logger.logToFile(res, parsedBody);
     });
   },
@@ -1076,15 +1079,16 @@ module.exports = logger;
       
     </pre>
     <p class="text">
-      Next import the module uptop in <span class="snippet">server.js</span> and
-      replace the
+      Next import the module up top in
+      <span class="snippet">server.js</span> and replace the
       <span class="snippet">res.write("Contact Manager Here..");</span> call in
       the <span class="snippet">/contact-manager</span> route with a call to our
       native module's <span class="snippet">displayWelcomeScreen(res)</span>:
     </p>
     <pre class="code">
 //put this up top in server.js
-const contactManager = require("./custom_modules/contactManager");
+const contactManager = 
+require("./custom_modules/contactManager");
 
 //call the displayWelcomeScreen in the /contact-manager route
 displayWelcomeScreen(res);
@@ -1098,6 +1102,210 @@ displayWelcomeScreen(res);
       >
       you will see the welcoming screen.
     </p>
+    <p class="text">
+      Let's now create a submit form which will be used to add our contacts. Add
+      the below method to <span class="snippet">contactManager.js</span>:
+    </p>
+    <pre class="code">
+      displayAddContact: (res) => {
+        res.write(`4
+        &lt;form
+        style="${logger.formStyles}"
+        action="/contact-manager/add"
+        method="POST"
+    &gt;
+        &lt;input 
+          name="name"
+          style="${logger.formField}"
+          type="text"
+          placeholder="name"&gt;
+          &lt;input 
+          name="email"
+          style="${logger.formField}"
+          type="email"
+          placeholder="e-mail"&gt;
+          &lt;input 
+          name="phone"
+          style="${logger.formField}"
+          type="phone"
+          placeholder="phone"&gt;
+        &lt;button 
+          style="${logger.formBtn}"
+          type="submit"&gt;
+          Add contact
+        &lt;/button&gt;
+    </form>
+        `);
+      },
+    </pre>
+    <p class="text">
+      As you can see, the add form uses some of the logger styles so just import it up top in the 
+      <span class="snippet">contactManager.js</span> module. Now on the contact manager page you also see the form for adding a
+      new contact.  Let's add quickly a case for adding the contact in the <span class="snippet">server.js</span>. Add it right 
+      above the default case:
+    </p>
+    <pre class="code">
+      if (method === "POST") {
+        contactManager.addContact(req, res);
+      }
+      break;
+    </pre>
+    <p class="text">
+      Next, add the <span class="snippet">addContact()</span> method inside the <span class="snippet">contactManager.js</span>
+      file right under displayAddContact():
+    </p>
+    <pre class="code">
+      addContact: (req, res) => {
+        res.write("ADDING CONTACT HERE");
+      }
+    </pre>
+    <p class="text">
+      Now if you submit the form as it is, you get the response from the method. Let's modify it so that it does what it's supposed 
+      to namely adding a contact to a JSON file. That's where we'll read from and display all the contacts. First remove the <span class="snippet">res.end()</span>
+      call from after calling <span class="snippet">addContact()</span> and import up top in the <span class="snippet">contactManager.js</span> module the filesystem module. Next
+      create a <span class="snippet">contacts.json</span> file inside the <span class="snippet">custom_modules</span> directory and replace the <span class="snippet">addContact()</span> method in the contact manager module as
+      per below:
+    </p>
+    <pre class="code">
+addContact: (req, res) => {
+  const body = [];
+  //on data to start reading data
+  req.on("data", (chunk) => {
+    body.push(chunk);
+  });
+
+  //on end to finish reading stream
+  req.on("end", () => {
+    //parse data
+    const parsedBody = Buffer.concat(body).toString();
+    const name = parsedBody
+    .split("&")[0]
+    .split("=")[1]
+    .split("+")
+    .join(" ")
+    .trim();
+  const email = parsedBody
+    .split("&")[1]
+    .split("=")[1]
+    .split("%")
+    .join("")
+    .trim();
+    const phone = parsedBody.split("&")[2].split("=")[1].trim();
+    const added = new Date()
+      .toString()
+      .replace(/\S+\s(\S+)\s(\d+)\s(\d+)\s.*/, "$2-$1-$3");
+    const contact = {
+      name,
+      email,
+      phone,
+      added,
+    };
+    const contactsDirectory = "./contacts";
+
+    fs.readFile(
+        "./custom_modules/contacts.json", 
+        "utf8", (err, data) => {
+      if (err) {
+        throw err;
+      }
+      let resources;
+      let objToWrite = {};
+      let contacts;
+      if (data !== "") {
+        //some contacts already
+        contacts = JSON.parse(data).contacts;
+        contacts.push(contact);
+        objToWrite.contacts = contacts; 
+      } else {
+        //no contacts
+        contacts = [];
+        contacts.push(contact);
+        objToWrite.contacts = contacts;
+      }
+      fs.writeFile(
+        "./custom_modules/contacts.json",
+        JSON.stringify(objToWrite),
+        (err) => {}
+      );
+      //redirect back to contact-manager page
+      res.statusCode = 302; //redirect
+      res.setHeader("Location", "/contact-manager");
+      res.end();
+    });
+  });
+}
+    </pre>
+    <p class="text">
+      Now our contact manager application stores the contacts in a <span class="snippet">contacts.json</span> file stored in the <span class="snippet">/custom_modules</span>
+      directory. Test it out and see how it works. Try deleting all the data inside the contacts file and then add more contacts.
+    </p>
+    <p class="text">
+      Let's now work quickly onto the display contacts method. We need one to see the contacts we currently have. Call it right under the <span class="snippet">/contact-manager</span> route
+      right after <span class="snippet">displayAddContact()</span>:
+    </p>
+    <pre class="code">
+      case "/contact-manager":
+      contactManager.displayWelcomeScreen(res);
+      contactManager.displayAddContact(res);
+      contactManager.displayContacts(res);
+      res.end();
+      break;
+    </pre>
+    <p class="text">
+      Next, add the code for it inside <span class="snippet">contactManager.js</span> right after <span class="snippet">addContact()</span>:
+    </p>
+    <pre class="code">
+      displayContacts: (res) => {
+        fs.readFile("./custom_modules/contacts.json", 
+        "utf8", (err, data) => {
+          if (err) {
+            throw err;
+          } 
+          let contacts;
+          if (data !== "") {
+            contacts = JSON.parse(data).contacts;
+          } else {
+            contacts = null;
+          }
+          if (contacts === null) {
+            res.write(`
+       &lt;div style="${contactManager.card}"&gt;
+               &lt;h1&gt;No Contacts Here&lt;/h1&gt; 
+          `);
+          } else {
+            contacts.map((c) =&gt; {
+              res.write(` 
+             &lt;div style=${contactManager.card};&gt;
+               &lt;p&gt;Name: ${c.name}&lt;/p&gt;
+               &lt;p&gt;E-mail: ${c.email}&lt;/p&gt;
+               &lt;p&gt;Phone: ${c.phone}&lt;/p&gt;
+               &lt;p&gt;Date added: ${c.added}&lt;/p&gt;
+               &lt;p&gt;&lt;a href="#"&gt;Delete Contact&lt;/a&gt;&lt;/p&gt;
+               &lt;p&gt;&lt;a href="#"&gt;Edit Contact&lt;/a&gt;&lt;/p&gt;
+             &lt;hr style="max-width:15rem;"&gt;
+           &lt;/div&gt;
+          `);
+            });
+          }
+          res.end();
+        });
+      }
+    </pre>
+    <p class="text">
+      Next, we need to set up the way methods are called in the <span class="snippet">/contact-manager</span> route. Modify it as per below:
+    </p>
+     <pre class="code">
+      case "/contact-manager":
+      contactManager.displayWelcomeScreen(res);
+      contactManager.displayAddContact(res);
+      contactManager.displayContacts(res);
+      break;
+     </pre>
+     <p class="text">
+       As you can see, we have called the <span class="snippet">displayContacts()</span> method last and we have removed the call to <span class="snippet">res.end()</span>.
+       The reason we did that, is because we are sending the client  response in the <span class="snippet">displayContacts()</span> method which takes the longest to execute because it
+       reads through the JSON file. Now we can add and see contacts.
+     </p>
     <p class="text center bold">
       Image uploader & gallery project (to define scope and all)
     </p>
