@@ -80,7 +80,7 @@ const contactManager = {
       const email = parsedBody
         .split("&")[1]
         .split("=")[1]
-        .split("%")
+        .split("%40")
         .join("@")
         .trim();
       const phone = parsedBody.split("&")[2].split("=")[1].trim();
@@ -255,7 +255,7 @@ const contactManager = {
       const email = parsedBody
         .split("&")[1]
         .split("=")[1]
-        .split("%")
+        .split("%40")
         .join("@")
         .trim();
 

@@ -1187,7 +1187,7 @@ addContact: (req, res) => {
   const email = parsedBody
     .split("&")[1]
     .split("=")[1]
-    .split("%")
+    .split("%40")
     .join("@")
     .trim();
     const phone = parsedBody.split("&")[2].split("=")[1].trim();
@@ -1308,11 +1308,338 @@ addContact: (req, res) => {
      <p class="text">
        As you can see, we have called the <span class="snippet">displayContacts()</span> method last and we have removed the call to <span class="snippet">res.end()</span>.
        The reason we did that, is because we are sending the client  response in the <span class="snippet">displayContacts()</span> method which takes the longest to execute because it
-       reads through the JSON file. Now we can add and see contacts. Let's do next the edit contact.
+       reads through the JSON file (that's where we move the <span class="snippet">res.end();</span> ). Now we can add and see contacts. Let's do next the edit contact.
      </p>
      <p class="text">
-       !!!!!!!!!!!!!!!!!//You added content type in server.js + made edit form point to route + created 2 methods to render the form and process the request for the route
+       We will start by adding one more line in the <span class="snippet">server.js</span> in order to set the content type the server sends back to the user. Add it right under 
+       the method definition (const method...):
      </p>
+     <pre class="code">
+      //set content type
+      res.setHeader("Content-Type", "text/html");
+     </pre>
+     <p class="text">
+       Next, let's add the <span class="snippet">/contact-manager/edit</span> route in the <span class="snippet">server.js</span>:
+     </p>
+     <pre class="code">
+case "/contact-manager/edit":
+//get id to edit
+let userId;
+let cookie = req.headers.cookie;
+const re = RegExp("userId=.*");
+if (cookie !== undefined) {
+  let cookies = cookie.split(";");
+  cookies.forEach((c) => {
+    if (re.test(c.trim()) === true) {
+      userId = c.split("=")[1];
+    }
+  });
+}
+if (method === "GET") {
+  //render edit form
+  contactManager.renderEditContact(res, userId);
+} else if (method === "POST") {
+  //do the actual edit in the back-end
+  contactManager.editContact(req, res, userId);
+}
+break;
+     </pre>
+     <p class="text">First, we will need to replace the <span class="snippet">displayContacts()</span>  method as per below:</p>
+     <pre class="code">
+displayContacts: (res) => {
+  fs.readFile("./custom_modules/contacts.json", 
+  "utf8", (err, data) => {
+    if (err) {
+      throw err;
+    }
+    let contacts;
+    if (data !== "") {
+      contacts = JSON.parse(data).contacts;
+    } else {
+      contacts = null;
+    }
+    if (contacts === null) {
+      res.write(`
+      &lt;div style="${contactManager.card}"&gt;
+          &lt;h1&gt;No Contacts Here&lt;/h1&gt; 
+      &lt;/div&gt;
+    `);
+    } else {
+      res.write(`&lt;div style="${contactManager.card}"&gt;
+        &lt;h1&gt;Current Contacts&lt;/h1&gt; 
+      &lt;/div&gt;`);
+      let id;
+      contacts.map((c) =&gt; {
+        res.write(` 
+        &lt;div style=${contactManager.card};&gt;
+          &lt;p&gt;Name: ${c.name}&lt;/p&gt;
+          &lt;p&gt;E-mail: ${c.email} &lt;/p&gt;
+          &lt;p&gt;Phone: ${c.phone} &lt;/p&gt;
+          &lt;p&gt;Date added: ${c.added} &lt;/p&gt;
+          &lt;p&gt;&lt;a href="#"&gt;Delete Contact&lt;/a&gt;&lt;/p&gt;
+          &lt;p&gt;&lt;a 
+            href="http://localhost:5000/contact-manager/edit" 
+            onclick="setCookie('${c.id}')" 
+            target="_blank"
+          &gt;
+            Edit Contact
+          &lt;/a&gt;&lt;/p&gt;
+        &lt;hr style="max-width:15rem;"&gt;
+      &lt;/div&gt;
+    `);
+      });
+      res.write(`
+      &lt;script&gt;
+        //set cookie to client
+          function setCookie(c){
+            console.log(c)
+            document.cookie = 'userId='+c;
+          }
+        &lt;/script&gt;
+      `);
+    }
+    res.end();
+  });
+}
+    </pre>
+    <p class="text">
+      Note we have just added a little client script which sets a cookie with the contact's id to the client. We will read that
+      cookie in the backend to 'know' which contact to edit. We also added an <span class="snippet">onClick</span> attribute on the 
+      edit link so that the client method is set each time we try to edit a contact (and we get a cookie with the resource's id).
+    </p>
+    <p class="text">
+      By the way we also need to modify the <span class="snippet">addContact()</span> method so it adds an id to each contact (the one we 
+      will set in the cookie and use to check in the back-end which contact to edit/delete). Replace it as per below:
+    </p>
+    <pre class="code">
+addContact: (req, res) => {
+  const body = [];
+  //on data to start reading data
+  req.on("data", (chunk) => {
+    body.push(chunk);
+  });
+
+  //on end to finish reading stream
+  req.on("end", () => {
+    //parse data
+    const parsedBody = Buffer.concat(body).toString();
+    const name = parsedBody
+      .split("&")[0]
+      .split("=")[1]
+      .split("+")
+      .join(" ")
+      .trim();
+    const email = parsedBody
+      .split("&")[1]
+      .split("=")[1]
+      .split("%40")
+      .join("@")
+      .trim();
+  const phone = parsedBody.split("&")[2].split("=")[1].trim();
+    const added = new Date()
+      .toString()
+      .replace(/\S+\s(\S+)\s(\d+)\s(\d+)\s.*/, "$2-$1-$3");
+    const id = Math.random().toString(12).substring(2, 17);
+    const contact = {
+      name,
+      email,
+      phone,
+      added,
+      id,
+    };
+
+    fs.readFile(
+        "./custom_modules/contacts.json", 
+        "utf8", (err, data) => {
+      if (err) {
+        throw err;
+      }
+      let resources;
+      let objToWrite = {};
+      let contacts;
+      if (data !== "") {
+        //some contacts already
+        contacts = JSON.parse(data).contacts;
+        contacts.unshift(contact);
+        objToWrite.contacts = contacts;
+      } else {
+        //no contacts
+        contacts = [];
+        contacts.unshift(contact);
+        objToWrite.contacts = contacts;
+      }
+      fs.writeFile(
+        "./custom_modules/contacts.json",
+        JSON.stringify(objToWrite),
+        (err) => {}
+      );
+      //redirect back to contact-manager page
+      res.statusCode = 302; //redirect
+      res.setHeader("Location", "/contact-manager");
+      res.end();
+    });
+  });
+}
+    </pre>
+    <p class="text">
+      Now we will add the 2 methods. As we can see, upon a <span class="snippet">GET</span> request, the route triggers a form display and upon a <span class="snippet">POST</span>
+      request it triggers the actual edit method in the backed. Let's add the <span class="snippet">renderEditContact()</span> method inside <span class="snippet">server.js</span>
+      right at the end, after <span class="snippet">displayContacts</span>:
+    </p>
+    <pre class="code">
+renderEditContact: (res, userId) => {
+  fs.readFile("./custom_modules/contacts.json", 
+  "utf8", (err, data) => {
+    if (err) {
+      throw err;
+    }
+    let contacts;
+    if (data !== "") {
+      contacts = JSON.parse(data).contacts;
+      console.log(userId);
+      contacts.map((c) => {
+        if (c.id === userId) {
+          res.write(`
+          &lt;form
+          style="${logger.formStyles}"
+          action="/contact-manager/edit"
+          method="POST"
+      &gt;
+          &lt;input 
+            name="name"
+            style="${logger.formField}"
+            value="${c.name}"
+            type="text"
+            placeholder="name"&gt;
+            &lt;input 
+            name="email"
+            style="${logger.formField}"
+            type="email"
+            value="${c.email}"
+            placeholder="e-mail"&gt;
+            &lt;input 
+            name="phone"
+            style="${logger.formField}"
+            type="phone"
+            value="${c.phone}"
+            placeholder="phone"&gt;
+            &lt;input type="hidden" value="${c.id}"&gt;
+          &lt;button 
+            style="${logger.formBtn}"
+            type="submit"&gt;
+            Edit contact
+          &lt;/button&gt;
+        &lt;/form&gt;
+          `);
+        }
+      });
+
+      res.end();
+    } else {
+      res.write(`&lt;div style="${contactManager.card}"&gt;
+        &lt;h1&gt;
+          Currently there are no Contacts to edit
+        &lt;/h1&gt; 
+      &lt;/div&gt;`);
+      res.end();
+    }
+  });
+}
+    </pre>
+    <p class="text">The method simply reads the <span class="snippet">contacts.json</span> file, loops throgh the contacts and when the id matches the one passed to 
+      the function (remember we checked the cookie in <span class="snippet">server.js</span> . When it finds the matching id among the contact,
+    it renders a form which makes a post to the same route and which has as values the contact details which we can modify. If it finds no contacts, it displays a card saying there
+    are no contacts. You can try to add another case for when there are contacts but the id is wrong (none of the contacts match it). This is only an introductory project so I did not add 
+    that case, but you may do it as an exercise. Next, right below add the <span class="snippet">renderEditContact()</span> add the <span class="snippet">editContact()</span> method:</p>
+    <pre class="code">
+editContact: (req, res, userId) => {
+  console.log(`userID: ${userId}`);
+  const body = [];
+  //on data to start reading data
+  req.on("data", (chunk) => {
+    body.push(chunk);
+  });
+
+  //on end to finish reading stream
+  req.on("end", () => {
+    //parse data
+    const parsedBody = Buffer.concat(body).toString();
+
+    const name = parsedBody
+      .split("&")[0]
+      .split("=")[1]
+      .split("+")
+      .join(" ")
+      .trim();
+
+    const email = parsedBody
+      .split("&")[1]
+      .split("=")[1]
+      .split("%40")
+      .join("@")
+      .trim();
+
+const phone = parsedBody.split("&")[2].split("=")[1].trim();
+
+    const added = new Date()
+      .toString()
+      .replace(/\S+\s(\S+)\s(\d+)\s(\d+)\s.*/, "$2-$1-$3");
+
+    const newContact = {
+      name,
+      email,
+      phone,
+      added,
+      id: userId,
+    };
+
+    fs.readFile("./custom_modules/contacts.json", 
+    "utf8", (err, data) => {
+      if (err) {
+        throw err;
+      }
+
+      let contacts;
+      if (data !== "") {
+        contacts = JSON.parse(data).contacts;
+        contacts.map((c, index) => {
+          console.log(c.id);
+
+          if (c.id === newContact.id) {
+            contacts.splice(index, 1, newContact);
+            const objToWrite = { contacts };
+            fs.writeFile(
+              "./custom_modules/contacts.json",
+              JSON.stringify(objToWrite),
+              (err) => {}
+            );
+            //set content type
+
+            //redirect back to contact-manager page
+            res.statusCode = 302; //redirect
+            res.setHeader("Location", "/contact-manager");
+            res.end();
+          }
+        });
+      } else {
+        res.write(`&lt;div 
+          style="${contactManager.card}"
+        &gt;
+          &lt;h1&gt;
+            Currently there are no Contacts to edit
+          &lt;/h1&gt;
+        &lt;/div&gt;`);
+        res.end();
+      }
+    });
+  });
+}
+    </pre>
+    <p class="text">
+      This method simply reads the contacts file, loops through them and edits the one with the matching id. It leaves the id and changes all the other properties
+      with the values from the form. Test out the edit and see how it works.
+    </p>
+   
     <p class="text center bold">
       Image uploader & gallery project (to define scope and all)
     </p>
