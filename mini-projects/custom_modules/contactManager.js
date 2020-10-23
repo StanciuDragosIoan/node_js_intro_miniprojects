@@ -292,30 +292,18 @@ const contactManager = {
                 JSON.stringify(objToWrite),
                 (err) => {}
               );
-              res.write(`
-                <h1> Contact ${c.name} edited successfully.</h1>
-                <p>Go to <a href="http://localhost:5000/contact-manager" target="_blank">Contact Manager Page</a> to view your contacts</p>
-              `);
+              //set content type
+
+              //redirect back to contact-manager page
+              res.statusCode = 302; //redirect
+              res.setHeader("Location", "/contact-manager");
               res.end();
             }
           });
-
-          // contacts.map((c) => {
-          //   if (c.name === newContact.name && c.email === newContact.email) {
-          //     console.log(newContact);
-          //     console.log(contacts);
-          //     console.log("some data");
-          //     res.write("POST EDIT HERE");
-          //     res.end();
-          //   }
-          // });
         } else {
-          //   console.log(data);
-          //   console.log("no data");
           res.write(`<div style="${contactManager.card}">
             <h1>Currently there are no Contacts to edit</h1>
           </div>`);
-          //   res.write("Test");
           res.end();
         }
       });
