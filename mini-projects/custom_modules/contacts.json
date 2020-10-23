@@ -1,1 +1,11 @@
-{"contacts":[{"name":"DRAGOS STANCIU22","email":"stanciudragosioan92@gmail.com","phone":"0727167403","added":"23-Oct-2020","id":"24ab934a5534708"},{"name":"Irina","email":"stanciudragosioan92@gmail.com","phone":"0727167403","added":"23-Oct-2020","id":"1344365028a9ba3"},{"name":"DRAGOS STANCIU","email":"stanciudragosioan92@gmail.com","phone":"0727167403","added":"23-Oct-2020","id":"5b034395a8a2055"}]}
+{
+  "contacts": [
+    {
+      "name": "DRAGOS STANCIU",
+      "email": "stanciudragosioan92@gmail.com",
+      "phone": "0727167403",
+      "added": "23-Oct-2020",
+      "id": "507aa54954915b6"
+    }
+  ]
+}

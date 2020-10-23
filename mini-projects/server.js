@@ -2,6 +2,7 @@
 const http = require("http");
 const contactManager = require("./custom_modules/contactManager");
 const logger = require("./custom_modules/logger");
+const imageUploader = require("./custom_modules/imageUploader");
 
 //define port for our server to listen to
 const PORT = process.env.port || 5000;
@@ -74,6 +75,11 @@ const server = http.createServer((req, res) => {
       if (method === "POST") {
         contactManager.addContact(req, res);
       }
+      break;
+    case "/image-uploader":
+      imageUploader.displayWelcomeScreen(res);
+      imageUploader.displayUploadForm(res);
+      res.end();
       break;
     default:
       res.write(`
