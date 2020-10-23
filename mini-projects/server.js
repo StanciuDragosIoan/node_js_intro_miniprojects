@@ -12,6 +12,8 @@ const server = http.createServer((req, res) => {
   const url = req.url;
   //define method
   const method = req.method;
+  //set content type
+  res.setHeader("Content-Type", "text/html");
   switch (url) {
     case "/":
       //write client response
@@ -37,6 +39,25 @@ const server = http.createServer((req, res) => {
       contactManager.displayWelcomeScreen(res);
       contactManager.displayAddContact(res);
       contactManager.displayContacts(res);
+      break;
+    case "/contact-manager/edit":
+      if (method === "GET") {
+        let cookie = req.headers.cookie;
+        const re = RegExp("userId=.*");
+        let userId;
+        if (cookie !== undefined) {
+          let cookies = cookie.split(";");
+          cookies.forEach((c) => {
+            if (re.test(c.trim()) === true) {
+              userId = c.split("=")[1];
+            }
+          });
+        }
+        contactManager.editContact(res, userId);
+      } else if (method === "POST") {
+        res.write("POST HERE");
+        res.end();
+      }
       break;
     case "/contact-manager/add":
       if (method === "POST") {

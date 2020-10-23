@@ -1188,7 +1188,7 @@ addContact: (req, res) => {
     .split("&")[1]
     .split("=")[1]
     .split("%")
-    .join("")
+    .join("@")
     .trim();
     const phone = parsedBody.split("&")[2].split("=")[1].trim();
     const added = new Date()
@@ -1199,8 +1199,7 @@ addContact: (req, res) => {
       email,
       phone,
       added,
-    };
-    const contactsDirectory = "./contacts";
+    }; 
 
     fs.readFile(
         "./custom_modules/contacts.json", 
@@ -1214,12 +1213,12 @@ addContact: (req, res) => {
       if (data !== "") {
         //some contacts already
         contacts = JSON.parse(data).contacts;
-        contacts.push(contact);
+        contacts.unshift(contact);
         objToWrite.contacts = contacts; 
       } else {
         //no contacts
         contacts = [];
-        contacts.push(contact);
+        contacts.unshift(contact);
         objToWrite.contacts = contacts;
       }
       fs.writeFile(
@@ -1271,8 +1270,13 @@ addContact: (req, res) => {
             res.write(`
        &lt;div style="${contactManager.card}"&gt;
                &lt;h1&gt;No Contacts Here&lt;/h1&gt; 
+          &lt;/div&gt;
           `);
           } else {
+            res.write(`
+            &lt;div style="${contactManager.card}"&gt;
+              &lt;h1&gt;Current Contacts&lt;/h1&gt; 
+            &lt;/div&gt;`);
             contacts.map((c) =&gt; {
               res.write(` 
              &lt;div style=${contactManager.card};&gt;
@@ -1304,7 +1308,7 @@ addContact: (req, res) => {
      <p class="text">
        As you can see, we have called the <span class="snippet">displayContacts()</span> method last and we have removed the call to <span class="snippet">res.end()</span>.
        The reason we did that, is because we are sending the client  response in the <span class="snippet">displayContacts()</span> method which takes the longest to execute because it
-       reads through the JSON file. Now we can add and see contacts.
+       reads through the JSON file. Now we can add and see contacts. Let's do next the edit contact.
      </p>
     <p class="text center bold">
       Image uploader & gallery project (to define scope and all)

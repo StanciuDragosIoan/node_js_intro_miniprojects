@@ -81,19 +81,20 @@ const contactManager = {
         .split("&")[1]
         .split("=")[1]
         .split("%")
-        .join("")
+        .join("@")
         .trim();
       const phone = parsedBody.split("&")[2].split("=")[1].trim();
       const added = new Date()
         .toString()
         .replace(/\S+\s(\S+)\s(\d+)\s(\d+)\s.*/, "$2-$1-$3");
+      const id = Math.random().toString(12).substring(2, 17);
       const contact = {
         name,
         email,
         phone,
         added,
+        id,
       };
-      const contactsDirectory = "./contacts";
 
       fs.readFile("./custom_modules/contacts.json", "utf8", (err, data) => {
         if (err) {
@@ -105,12 +106,12 @@ const contactManager = {
         if (data !== "") {
           //some contacts already
           contacts = JSON.parse(data).contacts;
-          contacts.push(contact);
+          contacts.unshift(contact);
           objToWrite.contacts = contacts;
         } else {
           //no contacts
           contacts = [];
-          contacts.push(contact);
+          contacts.unshift(contact);
           objToWrite.contacts = contacts;
         }
         fs.writeFile(
@@ -139,10 +140,15 @@ const contactManager = {
       }
       if (contacts === null) {
         res.write(`
-    <div style="${contactManager.card}">
+        <div style="${contactManager.card}">
             <h1>No Contacts Here</h1> 
+        </div>
       `);
       } else {
+        res.write(`<div style="${contactManager.card}">
+          <h1>Current Contacts</h1> 
+        </div>`);
+        let id;
         contacts.map((c) => {
           res.write(` 
           <div style=${contactManager.card};>
@@ -151,13 +157,78 @@ const contactManager = {
             <p>Phone: ${c.phone} </p>
             <p>Date added: ${c.added} </p>
             <p><a href="#">Delete Contact</a></p>
-            <p><a href="#">Edit Contact</a></p>
+            <p><a href="http://localhost:5000/contact-manager/edit" onclick="setCookie('${c.id}')" target="_blank">Edit Contact</a></p>
           <hr style="max-width:15rem;">
         </div>
       `);
         });
+        res.write(`
+        <script>
+          //set cookie to client
+            function setCookie(c){
+              console.log(c)
+              document.cookie = 'userId='+c;
+            }
+          </script>
+        `);
       }
       res.end();
+    });
+  },
+
+  editContact: (res, userId) => {
+    fs.readFile("./custom_modules/contacts.json", "utf8", (err, data) => {
+      if (err) {
+        throw err;
+      }
+      let contacts;
+      if (data !== "") {
+        contacts = JSON.parse(data).contacts;
+        console.log(userId);
+        contacts.map((c) => {
+          if (c.id === userId) {
+            res.write(`
+            <form
+            style="${logger.formStyles}"
+            action="/contact-manager/edit"
+            method="POST"
+        >
+            <input 
+              name="name"
+              style="${logger.formField}"
+              value="${c.name}"
+              type="text"
+              placeholder="name">
+              <input 
+              name="email"
+              style="${logger.formField}"
+              type="email"
+              value="${c.email}"
+              placeholder="e-mail">
+              <input 
+              name="phone"
+              style="${logger.formField}"
+              type="phone"
+              value="${c.phone}"
+              placeholder="phone">
+              <input type="hidden" value="${c.id}">
+            <button 
+              style="${logger.formBtn}"
+              type="submit">
+              Edit contact
+            </button>
+          </form>
+            `);
+          }
+        });
+
+        res.end();
+      } else {
+        res.write(`<div style="${contactManager.card}">
+          <h1>Currently there are no Contacts to edit</h1> 
+        </div>`);
+        res.end();
+      }
     });
   },
 };
