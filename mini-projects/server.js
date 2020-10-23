@@ -14,6 +14,20 @@ const server = http.createServer((req, res) => {
   const method = req.method;
   //set content type
   res.setHeader("Content-Type", "text/html");
+
+  //get id to edit
+  let userId;
+  let cookie = req.headers.cookie;
+  const re = RegExp("userId=.*");
+  if (cookie !== undefined) {
+    let cookies = cookie.split(";");
+    cookies.forEach((c) => {
+      if (re.test(c.trim()) === true) {
+        userId = c.split("=")[1];
+      }
+    });
+  }
+
   switch (url) {
     case "/":
       //write client response
@@ -38,27 +52,22 @@ const server = http.createServer((req, res) => {
     case "/contact-manager":
       contactManager.displayWelcomeScreen(res);
       contactManager.displayAddContact(res);
+      contactManager.displayFilter(res);
       contactManager.displayContacts(res);
       break;
     case "/contact-manager/edit":
-      //get id to edit
-      let userId;
-      let cookie = req.headers.cookie;
-      const re = RegExp("userId=.*");
-      if (cookie !== undefined) {
-        let cookies = cookie.split(";");
-        cookies.forEach((c) => {
-          if (re.test(c.trim()) === true) {
-            userId = c.split("=")[1];
-          }
-        });
-      }
       if (method === "GET") {
         //render edit form
         contactManager.renderEditContact(res, userId);
       } else if (method === "POST") {
         //do the actual edit in the back-end
         contactManager.editContact(req, res, userId);
+      }
+      break;
+    case "/contact-manager/delete":
+      if (method === "GET") {
+        //delete and redirect to home
+        contactManager.deleteContact(req, res, userId);
       }
       break;
     case "/contact-manager/add":

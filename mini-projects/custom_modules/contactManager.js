@@ -5,8 +5,13 @@ const contactManager = {
   displayWelcomeScreen: (res) => {
     res.write(`
         <div style="${contactManager.card}">
-            <h1>Welcome to contact manager</h1>
-            <p style="${contactManager.text}">An app to manage all your contacts</p>
+            <h1>
+              Welcome to contact manager
+            </h1>
+            <p 
+              style="${contactManager.text}">
+              An app to manage all your contacts
+            </p>
         </div>
         `);
   },
@@ -136,9 +141,9 @@ const contactManager = {
       if (data !== "") {
         contacts = JSON.parse(data).contacts;
       } else {
-        contacts = null;
+        contacts = [];
       }
-      if (contacts === null) {
+      if (contacts.length === 0) {
         res.write(`
         <div style="${contactManager.card}">
             <h1>No Contacts Here</h1> 
@@ -151,13 +156,27 @@ const contactManager = {
         let id;
         contacts.map((c) => {
           res.write(` 
-          <div style=${contactManager.card};>
-            <p>Name: ${c.name}</p>
-            <p>E-mail: ${c.email} </p>
-            <p>Phone: ${c.phone} </p>
-            <p>Date added: ${c.added} </p>
-            <p><a href="#">Delete Contact</a></p>
-            <p><a href="http://localhost:5000/contact-manager/edit" onclick="setCookie('${c.id}')" target="_blank">Edit Contact</a></p>
+          <div class="contact" style=${contactManager.card};>
+        <p>Name: ${c.name}</p>
+        <p>E-mail: ${c.email} </p>
+        <p>Phone: ${c.phone} </p>
+        <p>Date added: ${c.added} </p>
+        <p>
+          <a 
+            href="http://localhost:5000/contact-manager/delete" 
+                onclick="setCookie('${c.id}')"
+              >
+                Delete Contact
+              </a></p>
+
+            <p>
+              <a 
+            href="http://localhost:5000/contact-manager/edit" 
+                onclick="setCookie('${c.id}')" 
+                target="_blank"
+              >
+                Edit Contact
+              </a></p>
           <hr style="max-width:15rem;">
         </div>
       `);
@@ -166,7 +185,6 @@ const contactManager = {
         <script>
           //set cookie to client
             function setCookie(c){
-              console.log(c)
               document.cookie = 'userId='+c;
             }
           </script>
@@ -184,7 +202,6 @@ const contactManager = {
       let contacts;
       if (data !== "") {
         contacts = JSON.parse(data).contacts;
-        console.log(userId);
         contacts.map((c) => {
           if (c.id === userId) {
             res.write(`
@@ -225,7 +242,9 @@ const contactManager = {
         res.end();
       } else {
         res.write(`<div style="${contactManager.card}">
-          <h1>Currently there are no Contacts to edit</h1> 
+          <h1>
+            Currently there are no Contacts to edit
+          </h1> 
         </div>`);
         res.end();
       }
@@ -233,7 +252,6 @@ const contactManager = {
   },
 
   editContact: (req, res, userId) => {
-    console.log(`userID: ${userId}`);
     const body = [];
     //on data to start reading data
     req.on("data", (chunk) => {
@@ -282,8 +300,6 @@ const contactManager = {
         if (data !== "") {
           contacts = JSON.parse(data).contacts;
           contacts.map((c, index) => {
-            console.log(c.id);
-
             if (c.id === newContact.id) {
               contacts.splice(index, 1, newContact);
               const objToWrite = { contacts };
@@ -301,13 +317,112 @@ const contactManager = {
             }
           });
         } else {
-          res.write(`<div style="${contactManager.card}">
-            <h1>Currently there are no Contacts to edit</h1>
+          res.write(`
+          <div 
+            style="${contactManager.card}"
+          >
+            <h1>
+              Currently there are no Contacts to edit
+            </h1>
           </div>`);
           res.end();
         }
       });
     });
+  },
+
+  deleteContact: (req, res, userId) => {
+    const body = [];
+    //on data to start reading data
+    req.on("data", (chunk) => {
+      body.push(chunk);
+    });
+
+    //on end to finish reading stream
+    req.on("end", () => {
+      fs.readFile("./custom_modules/contacts.json", "utf8", (err, data) => {
+        if (err) {
+          throw err;
+        }
+
+        let contacts;
+        if (data !== "") {
+          contacts = JSON.parse(data).contacts;
+          contacts.map((c, index) => {
+            if (c.id === userId) {
+              contacts.splice(index, 1);
+              const objToWrite = { contacts };
+              fs.writeFile(
+                "./custom_modules/contacts.json",
+                JSON.stringify(objToWrite),
+                (err) => {}
+              );
+              //redirect back to contact-manager page
+              res.statusCode = 302; //redirect
+              res.setHeader("Location", "/contact-manager");
+              res.end();
+            }
+          });
+        } else {
+          res.write(`<div style="${contactManager.card}">
+            <h1>
+              Currently there are no Contacts to Delete
+            </h1>
+          </div>`);
+          res.end();
+        }
+      });
+    });
+  },
+
+  displayFilter: (res) => {
+    res.write(`
+    <input class="filter" style="${logger.formField}"
+    oninput="filter()"
+    onClick="clearInput()"
+    type="text"
+    value="Filter contacts"
+  />
+  <script>
+  //filter by name, email, phone
+  const filter = () => {
+    document.querySelectorAll(".contact").forEach((item) => {
+      
+      let value = document.querySelector(".filter")
+      .value.toLowerCase();
+      
+      
+      const name = item.children[0].
+          innerText.split(":")[1].trim();
+      const email = item.children[1]
+          .innerText.split(":")[1].trim();
+      const phone = item.children[2]
+          .innerText.split(":")[1].trim();
+      const added = item.children[3]
+          .innerText.split(":")[1].trim();
+      
+      
+      if (
+        name.toLowerCase().indexOf(value) != -1 ||
+        email.toLowerCase().indexOf(value) != -1 ||
+        phone.toLowerCase().indexOf(value) != -1 ||
+        added.toLowerCase().indexOf(value) != -1
+      ) {
+        item.style.display = "block";
+      } else {
+        item.style.display = "none";
+      } 
+    });
+    
+  };
+
+
+  //clear input upon click
+  const clearInput = () => {
+    document.querySelector(".filter").value = "";
+  }
+  </script>
+    `);
   },
 };
 
