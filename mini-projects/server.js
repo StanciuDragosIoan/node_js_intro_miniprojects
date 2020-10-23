@@ -41,22 +41,24 @@ const server = http.createServer((req, res) => {
       contactManager.displayContacts(res);
       break;
     case "/contact-manager/edit":
+      //get id to edit
+      let userId;
+      let cookie = req.headers.cookie;
+      const re = RegExp("userId=.*");
+      if (cookie !== undefined) {
+        let cookies = cookie.split(";");
+        cookies.forEach((c) => {
+          if (re.test(c.trim()) === true) {
+            userId = c.split("=")[1];
+          }
+        });
+      }
       if (method === "GET") {
-        let cookie = req.headers.cookie;
-        const re = RegExp("userId=.*");
-        let userId;
-        if (cookie !== undefined) {
-          let cookies = cookie.split(";");
-          cookies.forEach((c) => {
-            if (re.test(c.trim()) === true) {
-              userId = c.split("=")[1];
-            }
-          });
-        }
-        contactManager.editContact(res, userId);
+        //render edit form
+        contactManager.renderEditContact(res, userId);
       } else if (method === "POST") {
-        res.write("POST HERE");
-        res.end();
+        //do the actual edit in the back-end
+        contactManager.editContact(req, res, userId);
       }
       break;
     case "/contact-manager/add":

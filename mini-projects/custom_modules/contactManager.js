@@ -176,7 +176,7 @@ const contactManager = {
     });
   },
 
-  editContact: (res, userId) => {
+  renderEditContact: (res, userId) => {
     fs.readFile("./custom_modules/contacts.json", "utf8", (err, data) => {
       if (err) {
         throw err;
@@ -229,6 +229,96 @@ const contactManager = {
         </div>`);
         res.end();
       }
+    });
+  },
+
+  editContact: (req, res, userId) => {
+    console.log(`userID: ${userId}`);
+    const body = [];
+    //on data to start reading data
+    req.on("data", (chunk) => {
+      body.push(chunk);
+    });
+
+    //on end to finish reading stream
+    req.on("end", () => {
+      //parse data
+      const parsedBody = Buffer.concat(body).toString();
+
+      const name = parsedBody
+        .split("&")[0]
+        .split("=")[1]
+        .split("+")
+        .join(" ")
+        .trim();
+
+      const email = parsedBody
+        .split("&")[1]
+        .split("=")[1]
+        .split("%")
+        .join("@")
+        .trim();
+
+      const phone = parsedBody.split("&")[2].split("=")[1].trim();
+
+      const added = new Date()
+        .toString()
+        .replace(/\S+\s(\S+)\s(\d+)\s(\d+)\s.*/, "$2-$1-$3");
+
+      const newContact = {
+        name,
+        email,
+        phone,
+        added,
+        id: userId,
+      };
+
+      fs.readFile("./custom_modules/contacts.json", "utf8", (err, data) => {
+        if (err) {
+          throw err;
+        }
+
+        let contacts;
+        if (data !== "") {
+          contacts = JSON.parse(data).contacts;
+          contacts.map((c, index) => {
+            console.log(c.id);
+
+            if (c.id === newContact.id) {
+              contacts.splice(index, 1, newContact);
+              const objToWrite = { contacts };
+              fs.writeFile(
+                "./custom_modules/contacts.json",
+                JSON.stringify(objToWrite),
+                (err) => {}
+              );
+              res.write(`
+                <h1> Contact ${c.name} edited successfully.</h1>
+                <p>Go to <a href="http://localhost:5000/contact-manager" target="_blank">Contact Manager Page</a> to view your contacts</p>
+              `);
+              res.end();
+            }
+          });
+
+          // contacts.map((c) => {
+          //   if (c.name === newContact.name && c.email === newContact.email) {
+          //     console.log(newContact);
+          //     console.log(contacts);
+          //     console.log("some data");
+          //     res.write("POST EDIT HERE");
+          //     res.end();
+          //   }
+          // });
+        } else {
+          //   console.log(data);
+          //   console.log("no data");
+          res.write(`<div style="${contactManager.card}">
+            <h1>Currently there are no Contacts to edit</h1>
+          </div>`);
+          //   res.write("Test");
+          res.end();
+        }
+      });
     });
   },
 };
