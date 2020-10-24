@@ -1,6 +1,7 @@
 //import contactManager and logger for styles share
 const contactManager = require("./contactManager");
 const logger = require("./logger");
+
 const imageUploader = {
   displayWelcomeScreen: (res) => {
     res.write(`
@@ -18,18 +19,11 @@ const imageUploader = {
 
   displayUploadForm: (res) => {
     res.write(`
-      <form
-      style="${logger.formStyles}"
-      action=""
-      method="POST"
-  >
-      
-      <input 
-        style="${imageUploader.uploadBtn}"
-        type="file" 
-        />
-       
-  </form>
+    <h1>Upload Image</h1>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+              <input type="file" accept="image/*" name="photo" >
+              <input type="submit" value="upload">
+      </form>
       `);
   },
 

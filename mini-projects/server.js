@@ -81,6 +81,11 @@ const server = http.createServer((req, res) => {
       imageUploader.displayUploadForm(res);
       res.end();
       break;
+    case "/upload":
+      if (method === "POST") {
+        imageUploader.uploadFile(req, res);
+      }
+      break;
     default:
       res.write(`
       <h1>404 page not found X_x</h1>  
