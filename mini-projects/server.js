@@ -15,6 +15,7 @@ const server = http.createServer((req, res) => {
   const method = req.method;
   //set content type
   res.setHeader("Content-Type", "text/html");
+  // res.writeHead(200, { "Content-Type": "image/jpg" });
 
   //get id to edit
   let userId;
@@ -77,9 +78,14 @@ const server = http.createServer((req, res) => {
       }
       break;
     case "/image-uploader":
-      imageUploader.displayWelcomeScreen(res);
-      imageUploader.displayUploadForm(res);
-      res.end();
+      if (method === "GET") {
+        imageUploader.displayWelcomeScreen(res);
+        imageUploader.displayUploadForm(res);
+        imageUploader.displayImages(res);
+        //res.end();
+      } else if (method === "POST") {
+        imageUploader.uploadImage(req, res);
+      }
       break;
     case "/upload":
       if (method === "POST") {
