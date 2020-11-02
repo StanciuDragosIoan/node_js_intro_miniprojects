@@ -1,0 +1,7 @@
+Logged at: 02-Nov-2020, textLogged: Logger here 
+Logged at: 02-Nov-2020, textLogged: test 
+Logged at: 02-Nov-2020, textLogged: test 
+Logged at: 02-Nov-2020, textLogged: test 
+Logged at: 02-Nov-2020, textLogged: test works 
+Logged at: 02-Nov-2020, textLogged: test works2 
+Logged at: 02-Nov-2020, textLogged: tes 123 
