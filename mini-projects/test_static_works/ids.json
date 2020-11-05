@@ -1,0 +1,77 @@
+
+
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Gallery</title>
+      </head>
+      <body>
+          
+      <div style="
+    text-align:center;
+    padding: 1rem;
+    display:block;
+    margin:auto; 
+    margin-top:2rem;
+    background: blue;
+    color: #fff;
+    width:60%;
+    max-width:600px;
+    border: 15px solid #bbb;
+    border-radius: 5px;
+  ">
+      <h1>
+        Welcome to  the image uploader Gallery
+      </h1>
+      
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/013798a023ba563.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/02392117ba09642.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/099aa9994836357.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/13890b262ab3a79.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/141423074250222.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/34287b308ab4913.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/4001a5799678b91.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/4422b7b62685376.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/4812b6151910a41.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/5753a461ab1531.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/58236838126773.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/72423a9503a3809.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/732308064848373.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/7891008b0a15691.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/883755805707465.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/8968aa37b0296b5.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/9038b0bab21955b.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/a185064b08015b2.jpg" alt="some image">
+        
+          <img  style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" src="./uploads/a564a8419867463.jpg" alt="some image">
+        
+  </div>
+    
+  
+     
+    
+        
+      </body>
+      </html>
+      
+      
+      

@@ -101,7 +101,7 @@ const contactManager = {
         id,
       };
 
-      fs.readFile("./custom_modules/contacts.json", "utf8", (err, data) => {
+      fs.readFile("./contacts.json", "utf8", (err, data) => {
         if (err) {
           throw err;
         }
@@ -120,79 +120,87 @@ const contactManager = {
           objToWrite.contacts = contacts;
         }
         fs.writeFile(
-          "./custom_modules/contacts.json",
+          "./contacts.json",
           JSON.stringify(objToWrite),
-          (err) => {}
+          (err) => {
+            
+          }
         );
         //redirect back to contact-manager page
-        res.statusCode = 302; //redirect
-        res.setHeader("Location", "/contact-manager");
-        res.end();
+        
+        ;
       });
     });
   },
 
   displayContacts: (res) => {
-    return res.end("CONTACTS_HERE");
-    // fs.readFile("../custom_modules_static/contacts.json", "utf8", (err, data) => {
-    //   if (err) {
-    //     throw err;  
-    //   }
-    //   let contacts;
-    //   if (data !== "") {
-    //     contacts = JSON.parse(data).contacts;
-    //   } else {
-    //     contacts = [];
-    //   }
-    //   if (contacts.length === 0) {
-    //     res.write(`
-    //     <div style="${contactManager.card}">
-    //         <h1>No Contacts Here</h1> 
-    //     </div>
-    //   `);
-    //   } else {
-    //     res.end(`<div style="${contactManager.card}">
-    //       <h1>Current Contacts</h1> 
-    //     </div>`);
-    //     let id;
-    //     contacts.map((c) => {
-    //       res.end(` 
-    //       <div class="contact" style=${contactManager.card};>
-    //     <p>Name: ${c.name}</p>
-    //     <p>E-mail: ${c.email} </p>
-    //     <p>Phone: ${c.phone} </p>
-    //     <p>Date added: ${c.added} </p>
-    //     <p>
-    //       <a 
-    //         href="http://localhost:5000/contact-manager/delete" 
-    //             onclick="setCookie('${c.id}')"
-    //           >
-    //             Delete Contact
-    //           </a></p>
+    //return res.end("CONTACTS_HERE2");
+    fs.readFileSync("../custom_modules_static/contacts.json", "utf8", (err, data) => {
+      return res.end("in file read here");
+      console.log('line 138');
+      if (err) {
+        throw err;  
+      }
+      let contacts;
+      if (data !== "") {
+        contacts = JSON.parse(data).contacts;
+       //console.log(contacts);
+      } else {
+        contacts = [];
+      }
+      return contacts;
+      //return contacts;
+      if (contacts.length === 0) {
+      //   res.write(`
+      //   <div style="${contactManager.card}">
+      //       <h1>No Contacts Here</h1> 
+      //   </div>
+      // `);
+      //return res.end("no contacts");
+      } else {
+        // res.end(`<div style="${contactManager.card}">
+        //   <h1>Current Contacts</h1> 
+        // </div>`);
+        //return res.end("yes contacts");
+        let id;
+        contacts.map((c) => {
+      //     res.end(` 
+      //     <div class="contact" style=${contactManager.card};>
+      //   <p>Name: ${c.name}</p>
+      //   <p>E-mail: ${c.email} </p>
+      //   <p>Phone: ${c.phone} </p>
+      //   <p>Date added: ${c.added} </p>
+      //   <p>
+      //     <a 
+      //       href="http://localhost:5000/contact-manager/delete" 
+      //           onclick="setCookie('${c.id}')"
+      //         >
+      //           Delete Contact
+      //         </a></p>
 
-    //         <p>
-    //           <a 
-    //         href="http://localhost:5000/contact-manager/edit" 
-    //             onclick="setCookie('${c.id}')" 
-    //             target="_blank"
-    //           >
-    //             Edit Contact
-    //           </a></p>
-    //       <hr style="max-width:15rem;">
-    //     </div>
-    //   `);
-    //     });
-    //     res.write(`
-    //     <script>
-    //       //set cookie to client
-    //         function setCookie(c){
-    //           document.cookie = 'userId='+c;
-    //         }
-    //       </script>
-    //     `);
-    //   }
-    //  // return res.end();
-    // });
+      //       <p>
+      //         <a 
+      //       href="http://localhost:5000/contact-manager/edit" 
+      //           onclick="setCookie('${c.id}')" 
+      //           target="_blank"
+      //         >
+      //           Edit Contact
+      //         </a></p>
+      //     <hr style="max-width:15rem;">
+      //   </div>
+      // `);
+        });
+        // res.write(`
+        // <script>
+        //   //set cookie to client
+        //     function setCookie(c){
+        //       document.cookie = 'userId='+c;
+        //     }
+        //   </script>
+        // `);
+      }
+     // return res.end();
+    });
   },
 
   renderEditContact: (res, userId) => {

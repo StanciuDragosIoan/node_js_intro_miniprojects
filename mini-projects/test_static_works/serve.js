@@ -7,66 +7,20 @@ const fs = require('fs'),
 http.createServer(function (req, res) {
 //serve static resources
 
-    // if(req.url === "/test"){
-    //     return res.end("test");
-    // }  
-    
-    switch(req.url){
-      case "/test":
-        return res.end("test");
-        break;
-      case "/gallery":
-        
-          return res.end("gallery");
-          
+const url = req.url;
+const method = req.method;
+    if(url === "/image-uploader"){
+      if(method === "GET"){
+        imageUploader.displayWelcomeScreen(res);
+        imageUploader.displayUploadForm(res);
+        return res.end('');
+      } else if(method === 'POST'){
+        imageUploader.uploadImage(req, res);
+      }
       
-          
-       break;
-      case "/logger":
-        if (req.method === "GET") {
-          res.write(`
-          <h1  
-          >Welcome to our Logger Application</h1> 
-          `);
-          logger.renderLoggerForm(res);
-          return res.end();
-        } else if (req.method === "POST") {
-          //return res.end("POST HERE");
-          return logger.processForm(req, res);
-        }
-        break;
-        case "/contact-manager":
-          contactManager.displayWelcomeScreen(res);
-          
-          contactManager.displayAddContact(res);
-         
-          contactManager.displayFilter(res);
-            
-          //contactManager.displayContacts(res);
-          return res.end();
-          break;
-        case "/contact-manager/edit":
-          if (method === "GET") {
-            //render edit form
-            contactManager.renderEditContact(res, userId);
-          } else if (method === "POST") {
-            //do the actual edit in the back-end
-            contactManager.editContact(req, res, userId);
-          }
-          break;
-        case "/contact-manager/delete":
-          if (method === "GET") {
-            //delete and redirect to home
-            contactManager.deleteContact(req, res, userId);
-          }
-          break;
-        case "/contact-manager/add":
-          if (method === "POST") {
-            contactManager.addContact(req, res);
-          }
-          break;
-        //return res.end("gallery");
-    }
+    }  else {
+   
+     
 
    
    
@@ -86,11 +40,57 @@ http.createServer(function (req, res) {
       return;
     }
 
+    const testFolder = './uploads/';
+    const fs = require('fs');
+
+    fs.readdir(testFolder, (err, files) => {
+      let gallery = "";
+      files.forEach(file => {
+        console.log(file);
+        gallery +=`
+          <img  
+            style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" 
+            src="/uploads/${file}" alt="some image">
+        `;
+      });
+
+      let htmlOutput = `
+
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Gallery</title>
+      </head>
+      <body>
+          
+      <div style="${contactManager.card}">
+      <h1>
+        Welcome to  the image uploader Gallery
+      </h1>
+  
+  </div>
+    
+  
+     
+  ${gallery}
+        
+      </body>
+      </html>
+      
+      
+      `;
+     fs.writeFile("index.html", htmlOutput, (err) => {});
+    });
      
     res.writeHead(200);
     return res.end(data);
 
     
   });
+     
+}
+    
 
 }).listen(5555);

@@ -67,7 +67,7 @@ const imageUploader = {
         "File [" +
           fieldname +
           "]: filename: " +
-          filename +
+          `${filename}.jpg` +
           ", encoding: " +
           encoding +
           ", mimetype: " +
@@ -79,30 +79,27 @@ const imageUploader = {
       }
 
       const id = Math.random().toString(12).substring(2, 17);
-      const saveTo = path.join(__dirname, "./uploads", path.basename(id));
+      const saveTo = path.join(__dirname, "../test_static_works/uploads", path.basename(`${id}.jpg`));
       file.pipe(fs.createWriteStream(saveTo));
       file.on("data", function (data) {
-        console.log("File [" + fieldname + "] got " + data.length + " bytes");
+        //console.log("File [" + fieldname + "] got " + data.length + " bytes");
       });
       file.on("end", function () {
-        console.log("File [" + fieldname + "] Finished");
+        // console.log("File [" + fieldname + "] Finished");
       });
     });
 
-    busboy.on("finish", function () {
-      res.write(`
+    busboy.on("finish", function () { 
+      
+      return res.end(`
       <h1 style="${imageUploader.header}">File uploaded successfully</h1>
       <script>
         setTimeout(()=> {
-            window.location.href = "http://localhost:5000/image-uploader";
+            window.location.href = "http://localhost:5555/index.html";
         }, 2000);
       </script>
       `);
-      //res.setHeader("Location", "/image-uploader");
-      res.end();
-      //redirect back to homepage
-      // res.statusCode = 302; //redirect
-      // res.setHeader("Location", "/image-uploader");
+      
     });
     return req.pipe(busboy);
   },

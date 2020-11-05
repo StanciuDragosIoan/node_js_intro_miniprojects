@@ -59,8 +59,7 @@ const logger = {
 
     //on end to finish reading stream
     req.on("end", () => {
-      const parsedBody = Buffer.concat(body).toString();
-      console.log(`parsedBody here: ${parsedBody}`);
+      const parsedBody = Buffer.concat(body).toString(); 
       logger.logToFile(res, parsedBody);
     });
   },
