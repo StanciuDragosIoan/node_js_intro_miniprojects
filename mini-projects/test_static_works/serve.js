@@ -45,7 +45,12 @@ const method = req.method;
 
     fs.readdir(testFolder, (err, files) => {
       let gallery = "";
-      files.forEach(file => {
+      const path = require("path");
+      //filter images in order
+      files.sort((a, b) =>  {
+        return fs.statSync(testFolder + a).mtime.getTime() - 
+               fs.statSync(testFolder + b).mtime.getTime();
+    }).forEach(file => {
         console.log(file);
         gallery +=`
           <img  
@@ -74,8 +79,8 @@ const method = req.method;
     
   
      
-  ${gallery}
-        
+  ${gallery} 
+      
       </body>
       </html>
       
