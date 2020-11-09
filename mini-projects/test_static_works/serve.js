@@ -87,6 +87,24 @@ const method = req.method;
   
      
   ${gallery} 
+
+      
+  <script>
+         
+  //reload page once in cliend side so that user sees the image
+  window.addEventListener('DOMContentLoaded', (event) => {
+   console.log('DOM fully loaded and parsed');
+   if(document.URL.indexOf("#")==-1)
+   {
+       // Set the URL to whatever it was plus "#".
+       url = document.URL+"#";
+       location = "#";
+       //Reload the page
+       location.reload(true);
+
+   }
+});
+</script>
       
       </body>
       </html>
