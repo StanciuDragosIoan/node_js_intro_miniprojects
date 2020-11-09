@@ -51,10 +51,17 @@ const method = req.method;
         return fs.statSync(testFolder + a).mtime.getTime() - 
                fs.statSync(testFolder + b).mtime.getTime();
     }).forEach(file => {
-        console.log(file);
+       // console.log(file);
         gallery +=`
           <img  
-            style="display:block; margin:auto; margin-top:2rem; margin-bottom:2rem; max-width:700px;" 
+            style="
+              display:block; 
+              margin:auto; 
+              margin-top:2rem; 
+              margin-bottom:2rem; 
+              max-width:700px;
+              border: 5px solid #ccc;
+              border-radius:5px;" 
             src="/uploads/${file}" alt="some image">
         `;
       });
@@ -84,13 +91,12 @@ const method = req.method;
       </body>
       </html>
       
-      
       `;
      fs.writeFile("index.html", htmlOutput, (err) => {});
     });
      
-    res.writeHead(200);
-    return res.end(data);
+      res.writeHead(200);
+      return res.end(data);
 
     
   });
